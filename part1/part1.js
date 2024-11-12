@@ -61,3 +61,30 @@ console.log("d = " + d); // will display the value D (a + b)
 console.log(e + f); // compute both variables in one
 
 // let variables
+
+var a = 12;
+if (true) {
+  var b = 56;
+  let g = 80;
+  console.log("Within brackets : ");
+  console.log("a = " + a);
+  console.log("b = " + b);
+  console.log("g = " + g);
+}
+console.log("After brackets : ");
+console.log("a = " + a);
+console.log("b = " + b);
+// console.log("g = " + g); // error G is declared as let within a brackets compared to B declared as var which is available globally
+
+// no assignments
+h = 13; // is global
+console.log(h);
+
+var i;
+var j;
+console.log(i, j); // both are undefined
+
+// conditions
+if (true) {
+  console.log("always true");
+}
