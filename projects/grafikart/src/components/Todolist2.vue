@@ -2,19 +2,24 @@
 import { ref } from 'vue'
 const todos = ref([
   {
+    id: 1,
     title: 'Une tâche terminée',
     completed: true,
     date: 2,
   },
   {
+    id: 2,
     title: 'Une tâche à faire',
     completed: false,
     date: 1,
   },
 ])
+let id = 3
 const newTodo = ref('')
 const addTodo = () => {
+  id++
   todos.value.push({
+    id: id,
     title: newTodo.value,
     completed: false,
     date: Date.now(),
@@ -30,6 +35,10 @@ const sortedTodos = () => {
   return sortedTodos
 }
 const hideCompletedTodos = ref(false)
+
+const deleteTodo = (id) => {
+  todos.value = todos.value.filter((t) => t.id !== id)
+}
 </script>
 
 <template>
@@ -51,6 +60,7 @@ const hideCompletedTodos = ref(false)
     >
       <input type="checkbox" v-model="todo.completed" />
       {{ todo.title }}
+      <button @click="deleteTodo(todo.id)">Effacer</button>
     </li>
   </ul>
   <hr />
