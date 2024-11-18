@@ -9,18 +9,22 @@
           <div class="input-group">
             <div>New user</div>
             <input type="text" placeholder="Username" v-model="newUsername" />
-            <button>Add</button>
+            <button :disabled="newUsername.length === 0">Add</button>
           </div>
         </fieldset>
       </form>
     </div>
     <hr />
-    <input type="checkbox" v-model="areAllUsersSelected" @change="selectAllUsers" />Select all users
+    <div class="input-group">
+      <input type="checkbox" v-model="areAllUsersSelected" @change="selectAllUsers" />Select all
+      users : {{ selectedUsersCount }} selected
+      <div v-if="areAllUsersSelected"><button @click="deleteUsers">Delete</button></div>
+    </div>
     <hr />
     <table>
       <thead>
         <tr>
-          <th>Selected</th>
+          <th>Select</th>
           <th>Id</th>
           <th>Name</th>
           <th>Status</th>
@@ -29,9 +33,22 @@
       </thead>
       <tbody>
         <tr v-for="user in users" :key="user.id">
-          <td><input type="checkbox" v-model="isSelected" /></td>
+          <td><input type="checkbox" v-model="user.isSelected" /></td>
           <td>{{ user.id }}</td>
-          <td>{{ user.name }}</td>
+          <td @click="editingUserId !== user.id && displayInput(user.id)">
+            <div v-if="editingUserId === user.id">
+              <input
+                type="text"
+                v-model="user.name"
+                @blur="updateUserName(user.id, user.name)"
+                @keyup.enter="updateUserName(user.id, user.name)"
+              />
+            </div>
+            <div v-else>
+              {{ user.name }}
+            </div>
+          </td>
+
           <td>
             <select>
               <option :selected="user.status">Active</option>
@@ -39,10 +56,7 @@
             </select>
           </td>
           <td>
-            <div class="action-buttons">
-              <button>Update</button>
-              <button>Delete</button>
-            </div>
+            <button @click="deleteUser(user.id)">Delete</button>
           </td>
         </tr>
       </tbody>
@@ -50,9 +64,9 @@
   </main>
 </template>
 <script setup>
-import { ref } from 'vue'
-const selectAll = ref(false)
-const areAllUsersSelected = ref(false)
+import { computed, ref } from 'vue'
+
+// init user list
 const users = ref([
   {
     id: 0,
@@ -62,23 +76,60 @@ const users = ref([
   },
   {
     id: 1,
+    isSelected: false,
     name: 'Max',
     status: false,
   },
 ])
 const newUsername = ref('')
 let userCount = 2
-const isActive = ref(false)
+
+// Add new user
 const addUser = () => {
   users.value.push({
     id: userCount,
-    name: newUsername,
-    status: isActive,
+    isSelected: false,
+    name: newUsername.value,
+    status: true,
   })
   userCount++
   newUsername.value = ''
 }
-const selectAllUsers = () => {}
+
+// Select all users
+const areAllUsersSelected = ref(false)
+const selectAllUsers = () => {
+  users.value.forEach((user) => {
+    user.isSelected = areAllUsersSelected.value
+  })
+}
+
+// Count users selected
+const selectedUsersCount = computed(() => {
+  return users.value.filter((user) => user.isSelected).length
+})
+
+// Delete Users
+const deleteUsers = () => {
+  users.value = users.value.filter((user) => !user.isSelected)
+}
+
+// Edit username
+const editingUserId = ref(null)
+const displayInput = (id) => {
+  editingUserId.value = id
+}
+
+// Save username modification
+const updateUserName = (id, newName) => {
+  const user = users.value.find((user) => user.id === id)
+  if (user) {
+    user.name = newName
+    editingUserId.value = null
+  }
+}
+
+// Update status
 </script>
 
 <style scoped>
